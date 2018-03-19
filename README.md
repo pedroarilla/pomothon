@@ -6,7 +6,7 @@ Please, visit https://francescocirillo.com/pages/pomodoro-technique for further 
 
 # HOW TO USE
 
-Tun with `python pomothon.py` on your terminal.
+Run with `python pomothon.py` on your terminal.
 
 # License
 
