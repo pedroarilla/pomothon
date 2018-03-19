@@ -39,4 +39,4 @@ while True:
         print "Pomodoro #%s completed!" %i
         print "\rTake a break no longer than 5 minutes."
     print "----------------------------------------"
-print "\rWell done, you completed %s pomodoros.\nSee you later!\n" %i
+print "\rWell done, you completed %s pomodori.\nSee you later!\n" %i
