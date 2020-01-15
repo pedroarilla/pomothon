@@ -1,6 +1,6 @@
 # ABOUT
 
-[Pedro Arilla](http://pedroarilla.com)'s Pomodoro timer written in Python.
+[Pedro Arilla](http://pedroarilla.com)'s Pomodoro timer + tracker written in Python.
 
 Please, visit https://francescocirillo.com/pages/pomodoro-technique for further information about the Pomodoro technique.
 
