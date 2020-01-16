@@ -53,7 +53,7 @@ while True:
             if why in "a":
                 result = False
             pass
-        log.append([result, i,task])
+        log.append([result,i,task,1500-t])
         os.system("cls" if os.name == "nt" else "clear")
         masthead()
         print("\a")
@@ -65,9 +65,18 @@ os.system("cls" if os.name == "nt" else "clear")
 masthead()
 print("\a")
 print "You've completed %s pomodori today.\n" %n
+time = 0
+print "#\tMin\tTask"
+print "----------------------------------------"
 for row in log:
     if row[0]:
-        print tgreen + "%s" %row[1] + "\t" + row[2] + tdefault
+        minutes = row[3]/60
+        print tgreen + "%s" %row[1] + "\t" + "%s" %minutes + "\t" + row[2] + tdefault
+        time += row[3]
     else:
-        print "%s" %row[1] + "\t" + row[2]
-print "\nSee you later!" + bye.decode("unicode-escape") + "\n"
+        minutes = row[3]/60
+        print "%s" %row[1] + "\t" + "%s" %minutes + "\t" + row[2]
+m, s = divmod(time, 60)
+h, m = divmod(m, 60)
+print "\nEffective working time: " + "{:d}:{:02d}:{:02d}".format(h, m, s)
+print "See you later!" + bye.decode("unicode-escape") + "\n"
