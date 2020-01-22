@@ -22,7 +22,7 @@ log = []
 
 os.system("cls" if os.name == "nt" else "clear")
 masthead()
-print("\r")
+print "\r"
 while True:
     pomodoro = raw_input("Start a new pomodoro (Y/N)? ").lower()
     if pomodoro in "n":
@@ -33,7 +33,7 @@ while True:
         t = 1500
         i += 1
         masthead()
-        print("\r")
+        print "\r"
         print tomato.decode("unicode-escape") + " Pomodoro #%s:" %i + " " + task
         print help.decode("unicode-escape") + " (Ctrl+C to finish)"
         try:
@@ -56,18 +56,18 @@ while True:
         log.append([result,i,task,1500-t])
         os.system("cls" if os.name == "nt" else "clear")
         masthead()
-        print("\a")
+        print "\a"
         if result:
             n += 1
             print "Pomodoro #%s completed!" %i
             print "Take a break no longer than 5 minutes.\n"
 os.system("cls" if os.name == "nt" else "clear")
 masthead()
-print("\a")
+print "\a"
 print "You've completed %s pomodori today.\n" %n
 time = 0
 print "#\tMin\tTask"
-print "----------------------------------------"
+print "-" * 40
 for row in log:
     if row[0]:
         minutes = row[3]/60
