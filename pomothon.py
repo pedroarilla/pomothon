@@ -84,8 +84,8 @@ def pomodoro(i,j,log,project):
                 dict[str(project[1])] = {"name": project[2], "time": proj_time}
     return i, j, log, dict
 
+checkFiles()
 while True:
-    checkFiles()
     masthead(True)
     proj_class = raw_input("(P)ersonal project\n(W)ork project\n(E)xit? ").lower()
     if proj_class in "p":
@@ -104,6 +104,7 @@ while True:
         masthead(True)
         print proj_message
         proj_option = raw_input("(S)elect an existing project\n(C)reate a new project\n(B)ack? ").lower()
+        ### To-do: What if I want to delete a project?
         if proj_option in "s":
             masthead(True)
             ### To-do: What if there are a lot of projects?
@@ -116,7 +117,6 @@ while True:
                  x += 1
             print "\a"
             while True:
-                ### To-do: What if I want to delete a project?
                 proj_sel = raw_input("Select a project: ")
                 try:
                     int(proj_sel)
@@ -156,4 +156,5 @@ if j > 0:
     m, s = divmod(session_time, 60)
     h, m = divmod(m, 60)
     print "\nEffective working time: " + "{:d}:{:02d}:{:02d}".format(h, m, s)
+    ### To-do: What if I want to see a comprenhensive summary?
 print "See you later!" + emoji.bye.decode("unicode-escape") + "\n"
