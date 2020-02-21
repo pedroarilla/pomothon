@@ -2,7 +2,7 @@
 
 Pomothon (v2.01) is a simple CLI project tracker and Pomodoro timer written in Python by [Pedro Arilla](http://pedroarilla.com). Every session is divided into tasks assigned to specific projects. Pomothon records your work sessions and stores the data in JSON files.
 
-**Note:** Please, visit https://francescocirillo.com/pages/pomodoro-technique for further information about the Pomodoro technique.
+**Note:** The [Pomodoro technique](https://francescocirillo.com/pages/pomodoro-technique) is a time management method developed by Francesco Cirillo in the late 1980s.
 
 # HOW TO USE
 
