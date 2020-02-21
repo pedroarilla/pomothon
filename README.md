@@ -1,6 +1,6 @@
 # ABOUT
 
-Pomothon (v2.0) is a simple CLI project tracker and Pomodoro timer written in Python by [Pedro Arilla](http://pedroarilla.com). Every session is divided into tasks assigned to specific projects. Pomothon records your work sessions and stores the data in JSON files.
+Pomothon (v2.01) is a simple CLI project tracker and Pomodoro timer written in Python by [Pedro Arilla](http://pedroarilla.com). Every session is divided into tasks assigned to specific projects. Pomothon records your work sessions and stores the data in JSON files.
 
 **Note:** Please, visit https://francescocirillo.com/pages/pomodoro-technique for further information about the Pomodoro technique.
 

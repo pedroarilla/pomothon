@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# Pomothon v2.0
+# Pomothon v2.01 -- r20200221
 # by Pedro Arilla
 
 import sys
@@ -10,9 +10,12 @@ class emoji:
     tomato = "\U0001F345"
     clock = "\U000023F3"
     help = "\U0001F4A1"
+    file = "\U0001F4C2"
+    nap = "\U0001F4A4"
     bye = "\U0001F44B"
 class colour:
     green = "\033[32m"
+    red = "\033[031m"
     grey = "\033[2m"
     default = "\033[m"
 i = 0 # Number of pomodori
@@ -23,6 +26,7 @@ log = [] # [pomodoro1, pomodoro2, pomodoro3...]
 project = [] # [personal/work, position, name, time, new/existing]
 pomotime = 1500 # Set in seconds -- can be customised
 json_default = "{\"1\": {\"name\": \"Miscellaneous\", \"time\": 0}}"
+pomothon = " POMOTHON " + colour.grey + "v2.01 " + colour.default
 
 def checkFiles():
     if not os.path.exists("data"):
@@ -35,7 +39,7 @@ def checkFiles():
 def masthead(escape):
     os.system("cls" if os.name == "nt" else "clear")
     print "========================================"
-    print "|               POMOTHON               |"
+    print "|           " + pomothon + "           |"
     print "========================================"
     if escape:
         print "\r"
@@ -53,7 +57,7 @@ def pomodoro(i,j,log,project):
             t = pomotime
             i += 1
             masthead(True)
-            print emoji.tomato.decode("unicode-escape") + " Pomodoro #%s:" %i + " " + task + " [" + project[2] + "]"
+            print emoji.tomato.decode("unicode-escape") + " #%s:" %i + " " + task + " [" + project[2] + "]"
             print emoji.help.decode("unicode-escape") + " (Ctrl+C to finish)"
             try:
                 while t:
@@ -77,17 +81,23 @@ def pomodoro(i,j,log,project):
             masthead(False)
             if result:
                 j += 1
-                print "Pomodoro #%s completed!" %i
-                print "Take a break no longer than 5 minutes.\n"
-                task_time = task_time / 60
+                print emoji.tomato.decode("unicode-escape") + colour.green + " Pomodoro #%s completed!" %i + colour.default
+                print emoji.file.decode("unicode-escape") + " " + task + " [" + project[2] + "]"
+                print emoji.nap.decode("unicode-escape") + " Take a break no longer than 5 minutes.\n"
                 proj_time = int(project[3]) + task_time
                 dict[str(project[1])] = {"name": project[2], "time": proj_time}
+                with open(proj_file, "w") as f:
+                    json.dump(dict, f)
+            else:
+                print emoji.tomato.decode("unicode-escape") + colour.red + " Pomodoro #%s not completed :(" %i + colour.default
+                print emoji.file.decode("unicode-escape") + " " + task + " [" + project[2] + "]\n"
     return i, j, log, dict
 
 checkFiles()
 while True:
     masthead(True)
     proj_class = raw_input("(P)ersonal project\n(W)ork project\n(E)xit? ").lower()
+    ### To-do: What if I want to create a new type of project?
     if proj_class in "p":
         proj_file = "data/personal.json"
         proj_message = "> PERSONAL FILE\n"
@@ -104,17 +114,21 @@ while True:
         masthead(True)
         print proj_message
         proj_option = raw_input("(S)elect an existing project\n(C)reate a new project\n(B)ack? ").lower()
-        ### To-do: What if I want to delete a project?
+        ### To-do: What if I want to delete a project? -- show here already the list of projects
         if proj_option in "s":
             masthead(True)
-            ### To-do: What if there are a lot of projects?
-            print "{:3}{:5}{:20}".format("#", "Min", "Project")
+            ### To-do: What if there are a lot of (+9) projects? -- archive projects?
+            ### To-do: What if the project takes a longer time than 999 minutes? -- hours and minutes?
+            print "{:3}{:7}{:20}".format("#", "Minut", "Project")
             print "-" * 40
-            print colour.grey + "{:1}{:2}{:3}{:2}{:20}".format(0, "", "---", "", "[Press 0 to go back]") + colour.default
+            print colour.grey + "{:1}{:2}{:5}{:2}{:20}".format(0, "", "--:--", "", "[Press 0 to go back]") + colour.default
             x = 1
             while x <= len(dict):
-                 print "{:1}{:2}{:03d}{:2}{:20}".format(x, "", int(dict[str(x)]["time"]), "", dict[str(x)]["name"])
-                 x += 1
+                s = int(dict[str(x)]["time"])
+                m, s = divmod(s, 60)
+                h, m = divmod(m, 60)
+                print "{:1}{:2}{:02d}:{:02d}{:2}{:20}".format(x, "", h, m, "", dict[str(x)]["name"])
+                x += 1
             print "\a"
             while True:
                 proj_sel = raw_input("Select a project: ")
@@ -136,14 +150,12 @@ while True:
             i, j, log, dict = pomodoro(i,j,log,project)
         if proj_option in "b":
             break
-    with open(proj_file, "w") as f:
-        json.dump(dict, f)
 masthead(False)
 print "You've completed %s pomodori today.\n" %j
 if j > 0:
     session_time = 0
     print "{:4}{:5}{:20}{:24}".format("##", "Min", "Project", "Task")
-    print "-" * 50
+    print "-" * 39
     for row in log:
         minutes = row[3]/60
         ### To-do: What if the string got diacritics?
@@ -152,7 +164,7 @@ if j > 0:
             print colour.green + log_summary + colour.default
             session_time += row[3]
         else:
-            print log_summary
+            print colour.grey + log_summary + colour.default
     m, s = divmod(session_time, 60)
     h, m = divmod(m, 60)
     print "\nEffective working time: " + "{:d}:{:02d}:{:02d}".format(h, m, s)
