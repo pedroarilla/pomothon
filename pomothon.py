@@ -26,7 +26,7 @@ log = [] # [pomodoro1, pomodoro2, pomodoro3...]
 project = [] # [personal/work, position, name, time, new/existing]
 pomotime = 1500 # Set in seconds -- can be customised
 json_default = "{\"1\": {\"name\": \"Miscellaneous\", \"time\": 0}}"
-pomothon = " POMOTHON " + colour.grey + "v2.51  " + colour.default
+pomothon = " POMOTHON" + colour.grey + " v2.51 " + colour.default
 
 def checkFiles():
     # Checking that files exist and creating them if necessary
