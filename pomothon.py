@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# Pomothon v2.01 -- r20200221
+# Pomothon v2.5 -- r20200222
 # by Pedro Arilla
 
 import sys
@@ -26,17 +26,21 @@ log = [] # [pomodoro1, pomodoro2, pomodoro3...]
 project = [] # [personal/work, position, name, time, new/existing]
 pomotime = 1500 # Set in seconds -- can be customised
 json_default = "{\"1\": {\"name\": \"Miscellaneous\", \"time\": 0}}"
-pomothon = " POMOTHON " + colour.grey + "v2.01 " + colour.default
+pomothon = " POMOTHON " + colour.grey + "v2.5  " + colour.default
 
 def checkFiles():
+    # Checking files exist and creating them if necessary
     if not os.path.exists("data"):
         os.makedirs("data")
         with open(os.path.join("data", "personal.json"), "wb") as temp_file:
             temp_file.write(json_default)
         with open(os.path.join("data", "work.json"), "wb") as temp_file:
             temp_file.write(json_default)
+        with open(os.path.join("data", "archive.json"), "wb") as temp_file:
+            temp_file.write("{}")
 
 def masthead(escape):
+    # App masthead and clean the screen
     os.system("cls" if os.name == "nt" else "clear")
     print "========================================"
     print "|           " + pomothon + "           |"
@@ -47,20 +51,24 @@ def masthead(escape):
         print "\a"
 
 def pomodoro(i,j,log,project):
+    # Pomodoro timer
     while True:
         pomodoro = raw_input("Start a pomodoro in this project (Y/N)? ").lower()
         if pomodoro in "n":
             masthead(True)
             break
         if pomodoro in "y":
+            # Preparing
             task = raw_input("Task name: ")
             t = pomotime
             i += 1
+            # Initiating
             masthead(True)
             print emoji.tomato.decode("unicode-escape") + " #%s:" %i + " " + task + " [" + project[2] + "]"
             print emoji.help.decode("unicode-escape") + " (Ctrl+C to finish)"
             try:
                 while t:
+                    # Timer
                     sys.stdout.write("\r")
                     mins, secs = divmod(t, 60)
                     timer = emoji.clock.decode("unicode-escape") + " Time left: {:02d}:{:02d}".format(mins, secs)
@@ -69,6 +77,7 @@ def pomodoro(i,j,log,project):
                     time.sleep(1)
                     t -= 1
                     result = True
+            # Early stop
             except KeyboardInterrupt:
                 why = raw_input("\n\nFinished or Aborted (F/A)? ").lower()
                 if why in "f":
@@ -76,16 +85,20 @@ def pomodoro(i,j,log,project):
                 if why in "a":
                     result = False
                 pass
+            # Adding to the log
             task_time = pomotime - t
             log.append([result,i,task,task_time,project])
             masthead(False)
+            # Pomodoro summary
             if result:
                 j += 1
                 print emoji.tomato.decode("unicode-escape") + colour.green + " Pomodoro #%s completed!" %i + colour.default
                 print emoji.file.decode("unicode-escape") + " " + task + " [" + project[2] + "]"
                 print emoji.nap.decode("unicode-escape") + " Take a break no longer than 5 minutes.\n"
-                proj_time = int(project[3]) + task_time
-                dict[str(project[1])] = {"name": project[2], "time": proj_time}
+                # Adding to the dictionary
+                project[3] = int(project[3]) + task_time
+                dict[str(project[1])] = {"name": project[2], "time": str(project[3])}
+                # Dumping dictionary into project file
                 with open(proj_file, "w") as f:
                     json.dump(dict, f)
             else:
@@ -96,8 +109,9 @@ def pomodoro(i,j,log,project):
 checkFiles()
 while True:
     masthead(True)
+    # Selection menu
     proj_class = raw_input("(P)ersonal project\n(W)ork project\n(E)xit? ").lower()
-    ### To-do: What if I want to create a new type of project?
+    ##### To-do: What if I want to create a new type of project?
     if proj_class in "p":
         proj_file = "data/personal.json"
         proj_message = "> PERSONAL FILE\n"
@@ -108,65 +122,115 @@ while True:
         break
     else:
         continue
+    # Dumping JSON file into dictioanry
     with open(proj_file) as f:
         dict = json.load(f)
     while True:
         masthead(True)
         print proj_message
-        proj_option = raw_input("(S)elect an existing project\n(C)reate a new project\n(B)ack? ").lower()
-        ### To-do: What if I want to delete a project? -- show here already the list of projects
-        if proj_option in "s":
-            masthead(True)
-            ### To-do: What if there are a lot of (+9) projects? -- archive projects?
-            ### To-do: What if the project takes a longer time than 999 minutes? -- hours and minutes?
-            print "{:3}{:7}{:20}".format("#", "Minut", "Project")
-            print "-" * 40
-            print colour.grey + "{:1}{:2}{:5}{:2}{:20}".format(0, "", "--:--", "", "[Press 0 to go back]") + colour.default
-            x = 1
-            while x <= len(dict):
-                s = int(dict[str(x)]["time"])
-                m, s = divmod(s, 60)
-                h, m = divmod(m, 60)
-                print "{:1}{:2}{:02d}:{:02d}{:2}{:20}".format(x, "", h, m, "", dict[str(x)]["name"])
-                x += 1
-            print "\a"
+        ##### To-do: What if there are a lot of (+9) projects?
+        print "{:3}{:7}{:20}".format("#", "HH:MM", "Project")
+        print "-" * 40
+        # Projects list
+        x = 1
+        while x <= len(dict):
+            s = int(dict[str(x)]["time"])
+            m, s = divmod(s, 60)
+            h, m = divmod(m, 60)
+            print "{:1}{:2}{:02d}:{:02d}{:2}{:20}".format(x, "", h, m, "", dict[str(x)]["name"])
+            x += 1
+        print "\a"
+        # Selection menu
+        proj_option = raw_input("(S)elect an existing project\n(A)rchive an existing project\n(C)reate a new project\n(B)ack? ").lower()
+        # Select OR Archive
+        if proj_option in "sa":
+            print "\r"
+            # Selecting a project
             while True:
-                proj_sel = raw_input("Select a project: ")
+                proj_sel = raw_input("Select a project (#): ")
                 try:
                     int(proj_sel)
                 except ValueError:
                     True
                 else:
                     if int(proj_sel) <= len(dict):
-                        if int(proj_sel) == 0:
+                        if int(proj_sel) <= 0:
                             break
                         else:
-                            project = [proj_class, proj_sel, dict[proj_sel]["name"], dict[proj_sel]["time"], False]
-                            i, j, log, dict = pomodoro(i,j,log,project)
-                            break
+                            # Working on project
+                            if proj_option in "s":
+                                project = [proj_class, proj_sel, dict[proj_sel]["name"], dict[proj_sel]["time"], False]
+                                # Starting pomodoro
+                                i, j, log, dict = pomodoro(i,j,log,project)
+                                break
+                            # Archiving project
+                            if proj_option in "a":
+                                # Getting archive file into archive dictionary
+                                with open("data/archive.json") as f:
+                                    archive = json.load(f)
+                                # Appending project to archive dictionary
+                                archive[str(len(archive) + 1)] = {"type": proj_class, "name": dict[proj_sel]["name"], "time": dict[proj_sel]["time"]}
+                                # Dumping archive dictionary into archive file
+                                with open("data/archive.json", "w") as f:
+                                    json.dump(archive, f)
+                                # Deleting project from projects dictionary
+                                len_dict = len(dict)
+                                del dict[proj_sel]
+                                # Renumber all the projects
+                                proj_sel = int(proj_sel)
+                                while proj_sel < len_dict:
+                                    dict[str(proj_sel)] = {"name": dict[str(proj_sel+1)]["name"], "time": dict[str(proj_sel+1)]["time"]}
+                                    proj_sel += 1
+                                    del dict[str(proj_sel)]
+                                # Dump dictionary into projects file
+                                with open(proj_file, "w") as f:
+                                    json.dump(dict, f)
+                                # Showing that the project has been archived
+                                print "Archiving project",
+                                for dot in range(10):
+                                    sys.stdout.write(".")
+                                    sys.stdout.flush()
+                                    time.sleep(.25)
+                                break
         if proj_option in "c":
+            # Creating project
             proj_name = raw_input("\nProject name: ")
             project = [proj_class, len(dict)+1, proj_name, 0, True]
+            # Adding project to dictionary and project file
+            dict[str(project[1])] = {"name": project[2], "time": str(project[3])}
+            with open(proj_file, "w") as f:
+                json.dump(dict, f)
+            # Showing that the project has been created
+            print "Creating project",
+            for dot in range(10):
+                sys.stdout.write(".")
+                sys.stdout.flush()
+                time.sleep(.25)
+            print "\n"
+            # Starting pomodoro
             i, j, log, dict = pomodoro(i,j,log,project)
         if proj_option in "b":
             break
+# Closing session
 masthead(False)
 print "You've completed %s pomodori today.\n" %j
 if j > 0:
+    # Pomodori summary from the log
     session_time = 0
-    print "{:4}{:5}{:20}{:24}".format("##", "Min", "Project", "Task")
+    print "{:4}{:4}{:20}{:24}".format("##", "MM", "Project", "Task")
     print "-" * 39
     for row in log:
         minutes = row[3]/60
-        ### To-do: What if the string got diacritics?
-        log_summary = "{:02d}{:2}{:03d}{:2}{:20}{:24}".format(row[1], "", minutes, "", row[4][2], row[2])
+        ##### To-do: What if the string got diacritics?
+        log_summary = "{:02d}{:2}{:02d}{:2}{:20}{:24}".format(row[1], "", minutes, "", row[4][2], row[2])
         if row[0]:
             print colour.green + log_summary + colour.default
             session_time += row[3]
         else:
             print colour.grey + log_summary + colour.default
+    # Total working time
     m, s = divmod(session_time, 60)
     h, m = divmod(m, 60)
     print "\nEffective working time: " + "{:d}:{:02d}:{:02d}".format(h, m, s)
-    ### To-do: What if I want to see a comprenhensive summary?
+    ##### To-do: What if I want to see a comprenhensive summary?
 print "See you later!" + emoji.bye.decode("unicode-escape") + "\n"
