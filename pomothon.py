@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# Pomothon v2.5 -- r20200222
+# Pomothon v2.51 -- r20200222
 # by Pedro Arilla
 
 import sys
@@ -26,10 +26,10 @@ log = [] # [pomodoro1, pomodoro2, pomodoro3...]
 project = [] # [personal/work, position, name, time, new/existing]
 pomotime = 1500 # Set in seconds -- can be customised
 json_default = "{\"1\": {\"name\": \"Miscellaneous\", \"time\": 0}}"
-pomothon = " POMOTHON " + colour.grey + "v2.5  " + colour.default
+pomothon = " POMOTHON " + colour.grey + "v2.51  " + colour.default
 
 def checkFiles():
-    # Checking files exist and creating them if necessary
+    # Checking that files exist and creating them if necessary
     if not os.path.exists("data"):
         os.makedirs("data")
         with open(os.path.join("data", "personal.json"), "wb") as temp_file:
@@ -106,6 +106,35 @@ def pomodoro(i,j,log,project):
                 print emoji.file.decode("unicode-escape") + " " + task + " [" + project[2] + "]\n"
     return i, j, log, dict
 
+def archive(dict, proj_sel):
+    # Getting archive file into archive dictionary
+    with open("data/archive.json") as f:
+        archive = json.load(f)
+    # Appending project to archive dictionary
+    archive[str(len(archive) + 1)] = {"type": proj_class, "name": dict[proj_sel]["name"], "time": dict[proj_sel]["time"]}
+    # Dumping archive dictionary into archive file
+    with open("data/archive.json", "w") as f:
+        json.dump(archive, f)
+    # Deleting project from projects dictionary
+    len_dict = len(dict)
+    del dict[proj_sel]
+    # Renumber all the projects
+    proj_sel = int(proj_sel)
+    while proj_sel < len_dict:
+        dict[str(proj_sel)] = {"name": dict[str(proj_sel+1)]["name"], "time": dict[str(proj_sel+1)]["time"]}
+        proj_sel += 1
+        del dict[str(proj_sel)]
+    # Dump dictionary into projects file
+    with open(proj_file, "w") as f:
+        json.dump(dict, f)
+    # Showing that the project has been archived
+    print "Archiving project",
+    for dot in range(5):
+        sys.stdout.write(".")
+        sys.stdout.flush()
+        time.sleep(.3)
+    return dict
+
 checkFiles()
 while True:
     masthead(True)
@@ -128,7 +157,7 @@ while True:
     while True:
         masthead(True)
         print proj_message
-        ##### To-do: What if there are a lot of (+9) projects?
+        ##### To-do: What if there are a lot of projects (+9)?
         print "{:3}{:7}{:20}".format("#", "HH:MM", "Project")
         print "-" * 40
         # Projects list
@@ -141,6 +170,7 @@ while True:
             x += 1
         print "\a"
         # Selection menu
+        ##### To-do: Add manual record
         proj_option = raw_input("(S)elect an existing project\n(A)rchive an existing project\n(C)reate a new project\n(B)ack? ").lower()
         # Select OR Archive
         if proj_option in "sa":
@@ -165,32 +195,7 @@ while True:
                                 break
                             # Archiving project
                             if proj_option in "a":
-                                # Getting archive file into archive dictionary
-                                with open("data/archive.json") as f:
-                                    archive = json.load(f)
-                                # Appending project to archive dictionary
-                                archive[str(len(archive) + 1)] = {"type": proj_class, "name": dict[proj_sel]["name"], "time": dict[proj_sel]["time"]}
-                                # Dumping archive dictionary into archive file
-                                with open("data/archive.json", "w") as f:
-                                    json.dump(archive, f)
-                                # Deleting project from projects dictionary
-                                len_dict = len(dict)
-                                del dict[proj_sel]
-                                # Renumber all the projects
-                                proj_sel = int(proj_sel)
-                                while proj_sel < len_dict:
-                                    dict[str(proj_sel)] = {"name": dict[str(proj_sel+1)]["name"], "time": dict[str(proj_sel+1)]["time"]}
-                                    proj_sel += 1
-                                    del dict[str(proj_sel)]
-                                # Dump dictionary into projects file
-                                with open(proj_file, "w") as f:
-                                    json.dump(dict, f)
-                                # Showing that the project has been archived
-                                print "Archiving project",
-                                for dot in range(10):
-                                    sys.stdout.write(".")
-                                    sys.stdout.flush()
-                                    time.sleep(.25)
+                                dict = archive(dict, proj_sel)
                                 break
         if proj_option in "c":
             # Creating project
@@ -202,10 +207,10 @@ while True:
                 json.dump(dict, f)
             # Showing that the project has been created
             print "Creating project",
-            for dot in range(10):
+            for dot in range(5):
                 sys.stdout.write(".")
                 sys.stdout.flush()
-                time.sleep(.25)
+                time.sleep(.3)
             print "\n"
             # Starting pomodoro
             i, j, log, dict = pomodoro(i,j,log,project)
