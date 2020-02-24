@@ -61,14 +61,15 @@ def selectProject(len_dict):
 # Pomodoro timer
 def pomodoro(i,j,log,dict,project,proj_file):
     while True:
-        pomodoro = raw_input("(P)omodoro or (A)dd manual record -- or (B)ack? ").lower()
+        masthead(True)
+        pomodoro = raw_input("In this project [" + project[2] + "]:\n(P)omodoro\n(A)dd manual record\n(B)ack? ").lower()
         if pomodoro in "b":
             masthead(True)
             break
         if pomodoro in "a":
             # Getting time value
             while True:
-                t = raw_input("Time to add (in minutes): ")
+                t = raw_input("\nTime to add (in minutes): ")
                 try:
                     int(t)
                 except ValueError:
@@ -89,10 +90,9 @@ def pomodoro(i,j,log,dict,project,proj_file):
             print "Updating project",
             dotdotdot()
             masthead(True)
-            break
         if pomodoro in "p":
             # Preparing
-            task = raw_input("Task name: ")
+            task = raw_input("\nTask name: ")
             t = pomotime
             i += 1
             # Initiating
