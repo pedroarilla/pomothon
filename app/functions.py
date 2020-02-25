@@ -90,7 +90,7 @@ def pomodoro(i,j,log,dict,project,proj_file):
             print "Updating project",
             dotdotdot()
             masthead(True)
-            print emoji.file.decode("unicode-escape") + colour.green + " " + task + " [" + project[2] + "]" + " updated!"  + colour.default + "\n"
+            print emoji.file.decode("unicode-escape") + colour.green + " " + project[2] + " updated!\n"  + colour.default
         if pomodoro in "p":
             # Preparing
             task = raw_input("\nTask name: ")
