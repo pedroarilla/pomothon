@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Pomothon v2.60 -- r20200223
+# Pomothon v2.61 -- r20200225
 # Pedro Arilla -- pedroarilla.com
 
 # Import modules

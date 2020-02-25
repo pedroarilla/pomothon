@@ -60,8 +60,8 @@ def selectProject(len_dict):
 
 # Pomodoro timer
 def pomodoro(i,j,log,dict,project,proj_file):
+    masthead(True)
     while True:
-        masthead(True)
         pomodoro = raw_input("In this project [" + project[2] + "]:\n(P)omodoro\n(A)dd manual record\n(B)ack? ").lower()
         if pomodoro in "b":
             masthead(True)
@@ -90,6 +90,7 @@ def pomodoro(i,j,log,dict,project,proj_file):
             print "Updating project",
             dotdotdot()
             masthead(True)
+            print emoji.file.decode("unicode-escape") + colour.green + " " + task + " [" + project[2] + "]" + " updated!"  + colour.default + "\n"
         if pomodoro in "p":
             # Preparing
             task = raw_input("\nTask name: ")
@@ -121,8 +122,8 @@ def pomodoro(i,j,log,dict,project,proj_file):
             # Adding to the log
             task_time = pomotime - t
             log.append([result,i,task,task_time,project])
-            masthead(False)
             # Pomodoro summary
+            masthead(False)
             if result:
                 j += 1
                 print emoji.tomato.decode("unicode-escape") + colour.green + " Pomodoro #%s completed!" %i + colour.default
