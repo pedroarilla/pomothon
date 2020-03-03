@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Pomothon v2.61 -- r20200225
+# Pomothon v2.70 -- r20200303
 # Pedro Arilla -- pedroarilla.com
 
 # Import modules
@@ -85,8 +85,9 @@ while True:
             break
 # Closing session
 masthead(False)
-print "You've completed %s pomodori today.\n" %j
 if j > 0:
+    print "Today's session summary:\n"
+    ######## To-do: Save log to log file
     # Pomodori summary from the log
     session_time = 0
     print "{:4}{:4}{:20}{:24}".format("##", "MM", "Project", "Task")

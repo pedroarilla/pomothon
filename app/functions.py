@@ -26,7 +26,7 @@ def checkFiles():
 # Cleans the screen and prints app masthead
 def masthead(escape):
     os.system("cls" if os.name == "nt" else "clear")
-    pomothon = " POMOTHON" + colour.grey + " v2.60 " + colour.default
+    pomothon = " POMOTHON" + colour.grey + " v2.70 " + colour.default
     print "========================================"
     print "|           " + pomothon + "           |"
     print "========================================"
@@ -62,14 +62,63 @@ def selectProject(len_dict):
 def pomodoro(i,j,log,dict,project,proj_file):
     masthead(True)
     while True:
-        pomodoro = raw_input("In this project [" + project[2] + "]:\n(P)omodoro\n(A)dd manual record\n(B)ack? ").lower()
-        if pomodoro in "b":
+        option = raw_input("In this project [" + project[2] + "]:\n(P)omodoro\n(T)imer\n(M)anual record\n(B)ack? ").lower()
+        if option in "b":
             masthead(True)
             break
-        if pomodoro in "a":
+        if option in "t":
+            # Preparing
+            task = raw_input("\nTask name: ")
+            t = 0
+            i += 1
+            # Initiating
+            masthead(True)
+            print emoji.tomato.decode("unicode-escape") + " " + task + " [" + project[2] + "]"
+            print emoji.help.decode("unicode-escape") + " (Ctrl+C to finish)"
+            try:
+                while t >= 0:
+                    # Timer
+                    sys.stdout.write("\r")
+                    mins, secs = divmod(t, 60)
+                    timer = emoji.clock.decode("unicode-escape") + " Time spent: {:02d}:{:02d}".format(mins, secs)
+                    sys.stdout.write(timer)
+                    sys.stdout.flush()
+                    time.sleep(1)
+                    t += 1
+                    result = True
+            # Time stop
+            except KeyboardInterrupt:
+                why = raw_input("\n\n(F)inished or (A)borted? ").lower()
+                if why in "f":
+                    result = True
+                if why in "a":
+                    result = False
+                pass
+            # Adding to the log
+            log.append([result,i,task,t,project])
+            # Pomodoro summary
+            masthead(False)
+            if result:
+                j += 1
+                print emoji.tomato.decode("unicode-escape") + colour.green + " Task completed!" + colour.default
+                print emoji.file.decode("unicode-escape") + " " + task + " [" + project[2] + "]"
+                print emoji.nap.decode("unicode-escape") + " Take a break.\n"
+                # Adding to the dictionary
+                project[3] = int(project[3]) + t
+                dict[str(project[1])] = {"name": project[2], "time": str(project[3])}
+                # Dumping dictionary into project file
+                with open(proj_file, "w") as f:
+                    json.dump(dict, f)
+            else:
+                print emoji.tomato.decode("unicode-escape") + colour.red + " Task not completed :(" + colour.default
+                print emoji.file.decode("unicode-escape") + " " + task + " [" + project[2] + "]\n"
+        if option in "m":
+            # Preparing
+            i += 1
+            task = raw_input("\nTask name: ")
             # Getting time value
             while True:
-                t = raw_input("\nTime to add (in minutes): ")
+                t = raw_input("Time to add (in minutes): ")
                 try:
                     int(t)
                 except ValueError:
@@ -79,6 +128,9 @@ def pomodoro(i,j,log,dict,project,proj_file):
                         True
                     else:
                         break
+            # Updating log
+            task_time = int(t) * 60
+            log.append([True,i,task,task_time,project])
             # Adding to the dictionary
             t = int(t)*60
             project[3] = int(project[3]) + t
@@ -90,15 +142,15 @@ def pomodoro(i,j,log,dict,project,proj_file):
             print "Updating project",
             dotdotdot()
             masthead(True)
-            print emoji.file.decode("unicode-escape") + colour.green + " " + project[2] + " updated!\n"  + colour.default
-        if pomodoro in "p":
+            print emoji.file.decode("unicode-escape") + colour.green + " " + task + " added to " + project[2] + "!\n"  + colour.default
+        if option in "p":
             # Preparing
             task = raw_input("\nTask name: ")
             t = pomotime
             i += 1
             # Initiating
             masthead(True)
-            print emoji.tomato.decode("unicode-escape") + " #%s:" %i + " " + task + " [" + project[2] + "]"
+            print emoji.tomato.decode("unicode-escape") + " " + task + " [" + project[2] + "]"
             print emoji.help.decode("unicode-escape") + " (Ctrl+C to finish)"
             try:
                 while t:
@@ -126,7 +178,7 @@ def pomodoro(i,j,log,dict,project,proj_file):
             masthead(False)
             if result:
                 j += 1
-                print emoji.tomato.decode("unicode-escape") + colour.green + " Pomodoro #%s completed!" %i + colour.default
+                print emoji.tomato.decode("unicode-escape") + colour.green + " Pomodoro completed!" + colour.default
                 print emoji.file.decode("unicode-escape") + " " + task + " [" + project[2] + "]"
                 print emoji.nap.decode("unicode-escape") + " Take a break no longer than 5 minutes.\n"
                 # Adding to the dictionary
@@ -136,7 +188,7 @@ def pomodoro(i,j,log,dict,project,proj_file):
                 with open(proj_file, "w") as f:
                     json.dump(dict, f)
             else:
-                print emoji.tomato.decode("unicode-escape") + colour.red + " Pomodoro #%s not completed :(" %i + colour.default
+                print emoji.tomato.decode("unicode-escape") + colour.red + " Pomodoro not completed :(" %i + colour.default
                 print emoji.file.decode("unicode-escape") + " " + task + " [" + project[2] + "]\n"
     return i, j, log, dict, project
 
