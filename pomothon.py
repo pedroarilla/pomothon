@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Pomothon v2.70 -- r20200303
+# Pomothon v2.80 -- r20200303
 # Pedro Arilla -- pedroarilla.com
 
 # Import modules
@@ -8,15 +8,15 @@ import sys
 import os
 import json
 import time
+from datetime import datetime
 from app.functions import *
 from app.classes import *
 
 # Variables
 i = 0 # Number of pomodori
-j = 0 # Number of completed pomodori
 log = [] # [pomodoro1, pomodoro2, pomodoro3...]
          # where pomodoro is:
-         # [finished/aborted, position, name, time, project]
+         # [finished/aborted, position, name, time, project, project_time]
 project = [] # [personal/work, position, name, time, new/existing]
 
 # Main
@@ -63,7 +63,7 @@ while True:
             proj_sel = selectProject(len(dict))
             project = [proj_class, proj_sel, dict[proj_sel]["name"], dict[proj_sel]["time"], False]
             # Starting pomodoro
-            i, j, log, dict, project = pomodoro(i, j, log, dict, project, proj_file)
+            i, log, dict, project = pomodoro(i, log, dict, project, proj_file)
         # Archiving project
         if proj_option in "a":
             # Selecting a project
@@ -80,15 +80,14 @@ while True:
                 json.dump(dict, f)
             # Showing that the project has been created
             print "Creating project",
-            dotdotdot()
+            dotdotdot(5)
         if proj_option in "b":
             break
 # Closing session
 masthead(False)
-if j > 0:
-    print "Today's session summary:\n"
-    ######## To-do: Save log to log file
+if i > 0:
     # Pomodori summary from the log
+    print "Today's session summary:\n"
     session_time = 0
     print "{:4}{:4}{:20}{:24}".format("##", "MM", "Project", "Task")
     print "-" * 39
@@ -100,6 +99,12 @@ if j > 0:
             session_time += row[3]
         else:
             print colour.grey + log_summary + colour.default
+    # Save log to txt file
+    cleanlog = cleanLog(log)
+    log_name = datetime.today().strftime("%Y-%m-%d-%H%M%S") + ".txt"
+    with open(os.path.join("logs", log_name), "wb") as f:
+        for listitem in cleanlog:
+            f.write("%s\n" % listitem)
     # Total working time
     m, s = divmod(session_time, 60)
     h, m = divmod(m, 60)
@@ -110,4 +115,7 @@ if j > 0:
 ##### > Longest active project: Book (XX hours) -- default
 ##### > Time on archived projects: XX hours on X projects -- grey
 ##### > Longest project ever: Pomothon (XX hours) -- grey
+print "Closing session",
+dotdotdot(3)
+print " Done."
 print "See you later!" + emoji.bye.decode("unicode-escape") + "\n"

@@ -15,6 +15,7 @@ pomotime = 1500 # Set in seconds -- can be customised
 def checkFiles():
     if not os.path.exists("data"):
         os.makedirs("data")
+        os.makedirs("logs")
         json_default = "{\"1\": {\"name\": \"Miscellaneous\", \"time\": 0}}"
         with open(os.path.join("data", "personal.json"), "wb") as temp_file:
             temp_file.write(json_default)
@@ -26,7 +27,7 @@ def checkFiles():
 # Cleans the screen and prints app masthead
 def masthead(escape):
     os.system("cls" if os.name == "nt" else "clear")
-    pomothon = " POMOTHON" + colour.grey + " v2.70 " + colour.default
+    pomothon = " POMOTHON" + colour.grey + " v2.80 " + colour.default
     print "========================================"
     print "|           " + pomothon + "           |"
     print "========================================"
@@ -36,8 +37,8 @@ def masthead(escape):
         print "\a"
 
 # Prints a simple dot animation (loading)
-def dotdotdot():
-    for dot in range(5):
+def dotdotdot(x):
+    for dot in range(x):
         sys.stdout.write(".")
         sys.stdout.flush()
         time.sleep(.3)
@@ -59,14 +60,13 @@ def selectProject(len_dict):
                     return proj_sel
 
 # Pomodoro timer
-def pomodoro(i,j,log,dict,project,proj_file):
+def pomodoro(i,log,dict,project,proj_file):
     masthead(True)
     while True:
-        option = raw_input("In this project [" + project[2] + "]:\n(P)omodoro\n(T)imer\n(M)anual record\n(B)ack? ").lower()
+        option = raw_input("In this project [" + project[2] + "]:\n\n(P)omodoro\n(T)imer\n(M)anual record\n(B)ack? ").lower()
         if option in "b":
-            masthead(True)
             break
-        if option in "t":
+        elif option in "t":
             # Preparing
             task = raw_input("\nTask name: ")
             t = 0
@@ -94,12 +94,9 @@ def pomodoro(i,j,log,dict,project,proj_file):
                 if why in "a":
                     result = False
                 pass
-            # Adding to the log
-            log.append([result,i,task,t,project])
             # Pomodoro summary
             masthead(False)
             if result:
-                j += 1
                 print emoji.tomato.decode("unicode-escape") + colour.green + " Task completed!" + colour.default
                 print emoji.file.decode("unicode-escape") + " " + task + " [" + project[2] + "]"
                 print emoji.nap.decode("unicode-escape") + " Take a break.\n"
@@ -112,7 +109,9 @@ def pomodoro(i,j,log,dict,project,proj_file):
             else:
                 print emoji.tomato.decode("unicode-escape") + colour.red + " Task not completed :(" + colour.default
                 print emoji.file.decode("unicode-escape") + " " + task + " [" + project[2] + "]\n"
-        if option in "m":
+            # Adding to the log
+            log.append([result,i,task,t,project,project[3]])
+        elif option in "m":
             # Preparing
             i += 1
             task = raw_input("\nTask name: ")
@@ -128,22 +127,21 @@ def pomodoro(i,j,log,dict,project,proj_file):
                         True
                     else:
                         break
-            # Updating log
-            task_time = int(t) * 60
-            log.append([True,i,task,task_time,project])
             # Adding to the dictionary
-            t = int(t)*60
-            project[3] = int(project[3]) + t
+            task_time = int(t) * 60
+            project[3] = int(project[3]) + task_time
             dict[str(project[1])] = {"name": project[2], "time": str(project[3])}
             # Dumping dictionary into project file
             with open(proj_file, "w") as f:
                 json.dump(dict, f)
+            # Updating log
+            log.append([True,i,task,task_time,project,project[3]])
             # Showing that the project has been updated
             print "Updating project",
-            dotdotdot()
+            dotdotdot(5)
             masthead(True)
             print emoji.file.decode("unicode-escape") + colour.green + " " + task + " added to " + project[2] + "!\n"  + colour.default
-        if option in "p":
+        elif option in "p":
             # Preparing
             task = raw_input("\nTask name: ")
             t = pomotime
@@ -171,13 +169,10 @@ def pomodoro(i,j,log,dict,project,proj_file):
                 if why in "a":
                     result = False
                 pass
-            # Adding to the log
-            task_time = pomotime - t
-            log.append([result,i,task,task_time,project])
             # Pomodoro summary
             masthead(False)
+            task_time = pomotime - t
             if result:
-                j += 1
                 print emoji.tomato.decode("unicode-escape") + colour.green + " Pomodoro completed!" + colour.default
                 print emoji.file.decode("unicode-escape") + " " + task + " [" + project[2] + "]"
                 print emoji.nap.decode("unicode-escape") + " Take a break no longer than 5 minutes.\n"
@@ -188,9 +183,13 @@ def pomodoro(i,j,log,dict,project,proj_file):
                 with open(proj_file, "w") as f:
                     json.dump(dict, f)
             else:
-                print emoji.tomato.decode("unicode-escape") + colour.red + " Pomodoro not completed :(" %i + colour.default
+                print emoji.tomato.decode("unicode-escape") + colour.red + " Pomodoro not completed :(" + colour.default
                 print emoji.file.decode("unicode-escape") + " " + task + " [" + project[2] + "]\n"
-    return i, j, log, dict, project
+            # Adding to the log
+            log.append([result,i,task,task_time,project,project[3]])
+        else:
+            masthead(True)
+    return i, log, dict, project
 
 # Archives selected project
 def archive(dict, proj_sel, proj_class, proj_file):
@@ -216,5 +215,20 @@ def archive(dict, proj_sel, proj_class, proj_file):
         json.dump(dict, f)
     # Showing that the project has been archived
     print "Archiving project",
-    dotdotdot()
+    dotdotdot(5)
     return dict
+
+# Makes the log prettier for a more readable archiving
+def cleanLog(log):
+    cleanlog = []
+    for row in log:
+        if row[4][0] in "p":
+            type = "personal"
+        elif row[4][0] in "w":
+            type = "work"
+        if row[0]:
+            logitem = str(row[1]) + ": " + row[2] + " [" + type + ", " + row[4][2] + "], " + str(int(row[3])/60) + " minutes -- total in the project: " + str(int(row[5])/60) + " minutes."
+        else:
+            logitem = str(row[1]) + ": " + row[2] + " [" + row[4][2] + "] aborted."
+        cleanlog.append(logitem)
+    return cleanlog
