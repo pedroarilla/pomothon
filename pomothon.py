@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Pomothon v2.80 -- r20200303
+# Pomothon v2.81 -- r20200304
 # Pedro Arilla -- pedroarilla.com
 
 # Import modules
@@ -109,13 +109,14 @@ if i > 0:
     m, s = divmod(session_time, 60)
     h, m = divmod(m, 60)
     print "\nEffective working time: " + "{:d}:{:02d}:{:02d}".format(h, m, s)
+    print "Log saved at " + os.path.abspath(log_name),
 ##### To-do: What if I want to see a comprenhensive summary?
 ##### > Total time: XX hours (YY% personal; ZZ% work) -- green
 ##### > Time on active projects: XX hours on X projects -- default
 ##### > Longest active project: Book (XX hours) -- default
 ##### > Time on archived projects: XX hours on X projects -- grey
 ##### > Longest project ever: Pomothon (XX hours) -- grey
-print "Closing session",
+print "\nClosing session",
 dotdotdot(3)
 print " Done."
 print "See you later!" + emoji.bye.decode("unicode-escape") + "\n"

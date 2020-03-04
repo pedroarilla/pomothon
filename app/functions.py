@@ -27,7 +27,7 @@ def checkFiles():
 # Cleans the screen and prints app masthead
 def masthead(escape):
     os.system("cls" if os.name == "nt" else "clear")
-    pomothon = " POMOTHON" + colour.grey + " v2.80 " + colour.default
+    pomothon = " POMOTHON" + colour.grey + " v2.81 " + colour.default
     print "========================================"
     print "|           " + pomothon + "           |"
     print "========================================"
