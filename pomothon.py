@@ -1,6 +1,5 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Pomothon v2.81 -- r20200304
 # Pedro Arilla -- pedroarilla.com
 
 # Import modules
@@ -105,6 +104,8 @@ if i > 0:
     with open(os.path.join("logs", log_name), "wb") as f:
         for listitem in cleanlog:
             f.write("%s\n" % listitem)
+    ##### To-do: Include "effective working time" in the session log
+    ##### To-do: Save log by project
     # Total working time
     m, s = divmod(session_time, 60)
     h, m = divmod(m, 60)

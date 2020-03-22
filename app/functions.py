@@ -10,12 +10,12 @@ from app.classes import *
 
 # Variables
 pomotime = 1500 # Set in seconds -- can be customised
+appVersion = " v2.82 " # r20200322
 
 # Checks that files exist and creates them if necessary
 def checkFiles():
     if not os.path.exists("data"):
         os.makedirs("data")
-        os.makedirs("logs")
         json_default = "{\"1\": {\"name\": \"Miscellaneous\", \"time\": 0}}"
         with open(os.path.join("data", "personal.json"), "wb") as temp_file:
             temp_file.write(json_default)
@@ -23,11 +23,13 @@ def checkFiles():
             temp_file.write(json_default)
         with open(os.path.join("data", "archive.json"), "wb") as temp_file:
             temp_file.write("{}")
+    if not os.path.exists("logs"):
+        os.makedirs("logs")
 
 # Cleans the screen and prints app masthead
 def masthead(escape):
     os.system("cls" if os.name == "nt" else "clear")
-    pomothon = " POMOTHON" + colour.grey + " v2.81 " + colour.default
+    pomothon = " POMOTHON" + colour.grey + appVersion + colour.default
     print "========================================"
     print "|           " + pomothon + "           |"
     print "========================================"
@@ -89,6 +91,7 @@ def pomodoro(i,log,dict,project,proj_file):
             # Time stop
             except KeyboardInterrupt:
                 why = raw_input("\n\n(F)inished or (A)borted? ").lower()
+                ##### To-do: Repeat when another key different to F or A is pressed
                 if why in "f":
                     result = True
                 if why in "a":
@@ -111,6 +114,13 @@ def pomodoro(i,log,dict,project,proj_file):
                 print emoji.file.decode("unicode-escape") + " " + task + " [" + project[2] + "]\n"
             # Adding to the log
             log.append([result,i,task,t,project,project[3]])
+            session_time = 0
+            for row in log:
+                if row[0]:
+                    session_time += row[3]
+            m, s = divmod(session_time, 60)
+            h, m = divmod(m, 60)
+            print "Today's working time: " + "{:d}:{:02d}:{:02d}".format(h, m, s)
         elif option in "m":
             # Preparing
             i += 1
@@ -141,6 +151,13 @@ def pomodoro(i,log,dict,project,proj_file):
             dotdotdot(5)
             masthead(True)
             print emoji.file.decode("unicode-escape") + colour.green + " " + task + " added to " + project[2] + "!\n"  + colour.default
+            session_time = 0
+            for row in log:
+                if row[0]:
+                    session_time += row[3]
+            m, s = divmod(session_time, 60)
+            h, m = divmod(m, 60)
+            print "Today's working time: " + "{:d}:{:02d}:{:02d}".format(h, m, s)
         elif option in "p":
             # Preparing
             task = raw_input("\nTask name: ")
@@ -187,6 +204,13 @@ def pomodoro(i,log,dict,project,proj_file):
                 print emoji.file.decode("unicode-escape") + " " + task + " [" + project[2] + "]\n"
             # Adding to the log
             log.append([result,i,task,task_time,project,project[3]])
+            session_time = 0
+            for row in log:
+                if row[0]:
+                    session_time += row[3]
+            m, s = divmod(session_time, 60)
+            h, m = divmod(m, 60)
+            print "Today's working time: " + "{:d}:{:02d}:{:02d}".format(h, m, s)
         else:
             masthead(True)
     return i, log, dict, project
